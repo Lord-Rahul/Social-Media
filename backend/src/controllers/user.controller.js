@@ -6,12 +6,12 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 
 
 
-const generateAcessAndRefreshTokens = async (userId) => {
+const generateAccessAndRefreshTokens = async (userId) => {
     try {
 
         const user = await User.findById(userId);
         const refreshToken = user.generateRefreshToken();
-        const accessToken = user.generateAcessToken();
+        const accessToken = user.generateAccessToken();
         user.refreshToken = refreshToken;
         await user.save({ validateBeforeSave: false });
         return { accessToken, refreshToken };
@@ -54,7 +54,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const avatarLocalPath = req.files?.avatar[0]?.path;
     // const coverLocalPath = req.files?.coverImage[0]?.path;
     let coverLocalPath;
-    if (req.files && Array.isArray(req.files.cocerImage) && req.files.cocerImage.length > 0) {
+    if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
         coverLocalPath = req.files.coverImage[0].path
     }
 
@@ -104,13 +104,13 @@ const LoginUser = asyncHandler(async (req, res) => {
     //response logined
 
     const { email, username, password } = req.body;
-    if (!username || !email) {
+    if (!(username || email)) {
         throw new ApiError(400, "username or email is required");
 
     }
 
     const user = await User.findOne({
-        $or: [username, email]
+        $or: [{ username }, { email }]
     })
 
     if (!user) {
@@ -124,13 +124,16 @@ const LoginUser = asyncHandler(async (req, res) => {
         throw new ApiError(402, "invalid user credentials ")
     }
 
-    const { accessToken, refreshToken } = await generateAcessAndRefreshTokens(user._id);
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id);
 
-    const loggedInUser = await User.findById(user._id).select('-passsword -refreshToken');
+    const loggedInUser = await User.findById(user._id).select('-password -refreshToken');
     const options = {
         httpOnly: true,
         secure: true
     }
+
+    console.log(accessToken)
+    console.log(refreshToken);
 
     return res.status(200)
         .cookie("accessToken", accessToken, options)
