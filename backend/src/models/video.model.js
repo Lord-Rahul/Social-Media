@@ -8,15 +8,15 @@ const videoSchema = new mongoose.Schema(
       required: true,
     },
     thumbnail: {
-      type: string,
+      type: String,
       required: true,
     },
     title: {
-      type: string,
+      type: String,
       required: true,
     },
-    descreption: {
-      type: string,
+    description: {
+      type: String,
       required: true,
     },
     duration: {
