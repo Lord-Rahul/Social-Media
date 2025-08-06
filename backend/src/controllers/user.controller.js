@@ -58,19 +58,27 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   if (!avatarLocalPath) {
-    throw new ApiError(400, "upload avatar ");
+    // For testing purposes, use a default avatar if none provided
+    console.log("No avatar provided, using default");
   }
 
-  const avatar = await uploadOnCloud(avatarLocalPath);
-  const coverImage = await uploadOnCloud(coverLocalPath);
-
-  if (!avatar) {
-    throw new ApiError(400, "upload avatar ");
+  let avatar = null;
+  let coverImage = null;
+  
+  if (avatarLocalPath) {
+    avatar = await uploadOnCloud(avatarLocalPath);
+    if (!avatar) {
+      throw new ApiError(400, "Failed to upload avatar");
+    }
+  }
+  
+  if (coverLocalPath) {
+    coverImage = await uploadOnCloud(coverLocalPath);
   }
 
   const user = await User.create({
     fullname,
-    avatar: avatar.url,
+    avatar: avatar?.url || "https://via.placeholder.com/150/000000/FFFFFF/?text=Avatar",
     coverImage: coverImage?.url || "",
     email,
     password,
