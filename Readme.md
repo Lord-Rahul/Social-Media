@@ -26,12 +26,19 @@ A micro-social-media platform built with Node.js and Express
 
 ## Project Structure
 Social-Media/
+
 ├── backend/
+
 ├── controllers/
+
 ├── routes/
+
 ├── models/
+
 └── index.js
+
 ├── .gitignore
+
 └── README.md
 
 
